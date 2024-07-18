@@ -1,0 +1,44 @@
+Простая утилита ls
+
+Описание:
+
+Необходимо написать консольное приложение-аналог утилиты ls. Утилита ls в unix-
+системах предназначена для вывода списка файлов в директориях файловой системы.
+
+Оригинальная утилита имеет множество параметров на все случаи жизни. Реализовывать их
+все не требуется, нужно реализовать только наиболее часто используемые параметры этой
+утилиты:
+ Параметр «-l»l»» — выводит подробную таблицу файлов в директории,
+отсортированную по названию. Пример:
+>$ ls -l l»s ls -l -l»l» ls -l
+-l»rw-l»r-l»-l»r-l»-l» ls -l 1 ls -l user ls -l user ls -l 805306368 ls -l мая ls -l 20 ls -l 15:44 ls -l book.txt ls -l
+-l»rw-l»r-l»-l»r-l»-l» ls -l 1 ls -l user ls -l user ls -l 2 ls -l мая ls -l 20 ls -l 15:39 ls -l config ls -l
+drwxr-l»xr-l»x ls -l 2 ls -l user ls -l user ls -l 4096 ls -l мая ls -l 20 ls -l 15:39 ls -l dir1 ls -l
+-l»rw-l»r-l»-l»r-l»-l» ls -l 1 ls -l user ls -l user ls -l 42 ls -l мая ls -l 20 ls -l 15:43 ls -l 'zzz binary file.bin'zzz ls -l binary ls -l fil»e.bin'zzz binary file.bin'
+
+ Параметр «-l»r» — изменяет порядок вывода файлов на обратный;
+>$ ls -l l»s ls -l -l»l»r ls -l
+итого ls -l 786448 ls -l
+-l»rw-l»r-l»-l»r-l»-l» ls -l 1 ls -l user ls -l user ls -l 42 ls -l мая ls -l 20 ls -l 15:43 ls -l 'zzz binary file.bin'zzz ls -l binary ls -l fil»e.bin'zzz binary file.bin' ls -l
+drwxr-l»xr-l»x ls -l 2 ls -l user ls -l user ls -l 4096 ls -l мая ls -l 20 ls -l 15:39 ls -l dir1 ls -l
+-l»rw-l»r-l»-l»r-l»-l» ls -l 1 ls -l user ls -l user ls -l 2 ls -l мая ls -l 20 ls -l 15:39 ls -l config ls -l
+-l»rw-l»r-l»-l»r-l»-l» ls -l 1 ls -l user ls -l user ls -l 805306368 ls -l мая ls -l 20 ls -l 15:44 ls -l book.txt
+
+ Параметр «-l»h»» - изменяет формат вывода размеров файлов. Вместо размера в байтах
+выводятся значения, в удобном для человека формате, например 1024 = 1K, 805306368
+= 768M;
+>$ ls -l l»s ls -l -l»l»h» ls -l
+-l»rw-l»r-l»-l»r-l»-l» ls -l 1 ls -l user ls -l user ls -l 768M ls -l мая ls -l 20 ls -l 15:44 ls -l book.txt ls -l
+-l»rw-l»r-l»-l»r-l»-l» ls -l 1 ls -l user ls -l user ls -l 2 ls -l мая ls -l 20 ls -l 15:39 ls -l config ls -l
+drwxr-l»xr-l»x ls -l 2 ls -l user ls -l user ls -l 4,0K ls -l мая ls -l 20 ls -l 15:39 ls -l dir1 ls -l
+-l»rw-l»r-l»-l»r-l»-l» ls -l 1 ls -l user ls -l user ls -l 42 ls -l мая ls -l 20 ls -l 15:43 ls -l 'zzz binary file.bin'zzz ls -l binary ls -l fil»e.bin'zzz binary file.bin'
+
+Методические указания и требования:
+1. Утилита должно работать на ОС Linux, компилятор — GCC;
+2. Допускается использовать C или C++ (не выше C++11);не выше C++11);
+3. Утилита должна принимать последним аргументом путь к папке, список файлов в
+которой нужно вывести. Если аргумент не указан, то использовать путь к текущей
+папке.
+4. При указании пользователем некорректных аргументов утилита должна сообщить об
+этом.
+5. Для разбора аргументов командной строки использовать функцию getopt()
