@@ -118,8 +118,17 @@ void print_files_list(struct dirname_t *dir_list)
         {
             if(list)
             {
-                printf("%o %d %d %d %s\n", file_stat_list[file_iterator].st_mode, file_stat_list[file_iterator].st_uid,
-                 file_stat_list[file_iterator].st_gid, file_stat_list[file_iterator].st_size, filename[file_iterator]);
+                printf( (S_ISDIR(file_stat_list[file_iterator].st_mode)) ? "d" : "-");
+                printf( (file_stat_list[file_iterator].st_mode & S_IRUSR) ? "r" : "-");
+                printf( (file_stat_list[file_iterator].st_mode & S_IWUSR) ? "w" : "-");
+                printf( (file_stat_list[file_iterator].st_mode & S_IXUSR) ? "x" : "-");
+                printf( (file_stat_list[file_iterator].st_mode & S_IRGRP) ? "r" : "-");
+                printf( (file_stat_list[file_iterator].st_mode & S_IWGRP) ? "w" : "-");
+                printf( (file_stat_list[file_iterator].st_mode & S_IXGRP) ? "x" : "-");
+                printf( (file_stat_list[file_iterator].st_mode & S_IROTH) ? "r" : "-");
+                printf( (file_stat_list[file_iterator].st_mode & S_IWOTH) ? "w" : "-");
+                printf( (file_stat_list[file_iterator].st_mode & S_IXOTH) ? "x" : "-");
+                printf(" %s\n", filename[file_iterator]);
             }
             else
             {
