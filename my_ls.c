@@ -116,7 +116,18 @@ void print_files_list(struct dirname_t *dir_list)
         //Вывод содержимого папки
         for (int i = 0; i < files_count; i++)
         {
-            printf("%s\n", filename[file_iterator]);
+            if(list)
+            {
+                printf("%o %d %d %d %s\n", file_stat_list[file_iterator].st_mode, file_stat_list[file_iterator].st_uid,
+                 file_stat_list[file_iterator].st_gid, file_stat_list[file_iterator].st_size, filename[file_iterator]);
+            }
+            else
+            {
+                //Простой вывод
+                printf("%s\n", filename[file_iterator]);
+            }
+
+            //Переход к следующему файлу
             file_iterator += file_addin;
         }
 
