@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <dirent.h>
+#include <sys/stat.h>
 
 
 /// @brief Односвязный список каталогов
@@ -47,15 +48,76 @@ void print_files_list(struct dirname_t *dir_list)
         DIR *dir_desc_ptr;
         struct dirent *ep;
 
+        //Открытие каталога
         dir_desc_ptr = opendir(dir_iter->dirname);
         if(dir_desc_ptr == NULL)
-        {
+        {   //Каталог не найден
             printf("No such directory: %s", dir_iter->dirname);
+            return;
         }
 
+        //Подсчёт числа файлов в каталоге
+        int files_count = 0;
         while((ep = readdir(dir_desc_ptr)) != NULL)
         {
-            printf("%s\n", ep->d_name);
+            files_count++;
+        }
+
+        //Пустой каталог
+        if(files_count == 0)
+        {
+            printf("./\n");
+            printf("../\n");
+            return;            
+        }
+
+        struct stat file_stat_list[files_count];
+        char filename[files_count][PATH_MAX];
+
+        //Итератор
+        int file_iterator = 0;
+
+        //Так делать не стоит. Вдруг что-то в каталоге поменяется?
+        closedir(dir_desc_ptr);
+        dir_desc_ptr = opendir(dir_iter->dirname);
+        if(dir_desc_ptr == NULL)
+        {   //Каталог не найден
+            printf("No such directory: %s", dir_iter->dirname);
+            return;
+        }        
+
+        //Получение списка файлов со всеми аттрибутами
+        while((ep = readdir(dir_desc_ptr)) != NULL)
+        {
+            char path[PATH_MAX];
+            snprintf(path, PATH_MAX, "%s/%s", dir_iter->dirname, ep->d_name);
+            if(stat(path, &file_stat_list[file_iterator])) 
+            {
+                printf("stat failed\n");
+                return;
+            }
+
+            strcpy(filename[file_iterator], ep->d_name);
+
+            file_iterator++;
+        }
+
+        file_iterator = 0;
+        //Добавление
+        int file_addin = 1;
+
+        //Для реверсивного вывода меняем порядок обхода на обратный
+        if(reverse)
+        {
+            file_iterator = files_count - 1;
+            file_addin = -1;
+        }
+
+        //Вывод содержимого папки
+        for (int i = 0; i < files_count; i++)
+        {
+            printf("%s\n", filename[file_iterator]);
+            file_iterator += file_addin;
         }
 
         //Достигли конца списка каталогов
@@ -65,6 +127,13 @@ void print_files_list(struct dirname_t *dir_list)
 }
 
 
+/**
+ * @brief Главная функция
+ * 
+ * @param argc Число параметров
+ * @param argv Массив параметров
+ * @return int Возвращаемый результат
+ */
 int main(int argc, char* argv[])
 {
     //Определение входных параметров
@@ -99,7 +168,7 @@ int main(int argc, char* argv[])
             optind++;
         }
 
-        if(optind == argc) break;
+        if(optind >= argc) break;
     }
     
     //Голова списка каталогов
