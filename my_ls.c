@@ -10,15 +10,49 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <getopt.h>
 #include <stdbool.h>
 #include <string.h>
 
 
+/// @brief Односвязный список каталогов
+struct dirname_t
+{
+    char *dirname;                  ///Имя каталога
+    struct dirname_t *next_dir;     ///Указатель на следующий элемент
+};
+
+
+char* str_default_dir = "./";
+
+
+bool list = false;
+bool reverse = false;
+bool non_bytes = false;
+
+
+/**
+ * @brief Вывести список файлов в каталогах
+ * 
+ * @param dir_list Список каталогов
+ */
+void print_files_list(struct dirname_t *dir_list)
+{
+    struct dirname_t *dir_iter = dir_list;
+
+    while(1)
+    {
+        printf("%s\n", dir_iter->dirname);
+        //Достигли конца списка каталогов
+        if(dir_iter->next_dir == NULL) break;
+        dir_iter = dir_iter->next_dir;
+    }
+}
+
+
 int main(int argc, char* argv[])
 {
-    bool list = false, reverse = false, non_bytes = false;
-
     //Определение входных параметров
     while(1)
     {
@@ -53,16 +87,37 @@ int main(int argc, char* argv[])
 
         if(optind == argc) break;
     }
+    
+    //Голова списка каталогов
+    struct dirname_t head;
+    head.dirname = NULL;
+    head.next_dir = NULL;
+
+    //Итератор
+    struct dirname_t *dir_iter = &head;
 
     //Для определения списка заданных каталогов
     for (int i = 1; i < argc; i++)
     {
         if(argv[i][0] != '-')
         {
-            printf("size: %d \n", strlen(argv[i]));
+            dir_iter->next_dir = (struct dirname_t *)malloc(sizeof(struct dirname_t));
+            dir_iter = dir_iter->next_dir;
+            dir_iter->dirname = NULL;
+            dir_iter->next_dir = NULL;
+
+            dir_iter->dirname = (char *)malloc(strlen(argv[i]) * sizeof(char));
+            strcpy(dir_iter->dirname, argv[i]);
         }
     }
-    
+
+    //Если каталогов не задали
+    if(head.next_dir == NULL)
+    {   //Каталог по-умолчанию
+        head.dirname = str_default_dir;
+    }
+
+    print_files_list(&head);
     
     return 0;
 }
