@@ -14,6 +14,7 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <string.h>
+#include <dirent.h>
 
 
 /// @brief Односвязный список каталогов
@@ -43,7 +44,20 @@ void print_files_list(struct dirname_t *dir_list)
 
     while(1)
     {
-        printf("%s\n", dir_iter->dirname);
+        DIR *dir_desc_ptr;
+        struct dirent *ep;
+
+        dir_desc_ptr = opendir(dir_iter->dirname);
+        if(dir_desc_ptr == NULL)
+        {
+            printf("No such directory: %s", dir_iter->dirname);
+        }
+
+        while((ep = readdir(dir_desc_ptr)) != NULL)
+        {
+            printf("%s\n", ep->d_name);
+        }
+
         //Достигли конца списка каталогов
         if(dir_iter->next_dir == NULL) break;
         dir_iter = dir_iter->next_dir;
