@@ -16,6 +16,9 @@
 #include <string.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <grp.h>
+#include <pwd.h>
 
 
 /// @brief Односвязный список каталогов
@@ -128,6 +131,22 @@ void print_files_list(struct dirname_t *dir_list)
                 printf( (file_stat_list[file_iterator].st_mode & S_IROTH) ? "r" : "-");
                 printf( (file_stat_list[file_iterator].st_mode & S_IWOTH) ? "w" : "-");
                 printf( (file_stat_list[file_iterator].st_mode & S_IXOTH) ? "x" : "-");
+                struct passwd *pwd;
+                struct group *grp;
+
+                pwd = getpwuid(file_stat_list[file_iterator].st_uid);
+                if (pwd == NULL) {
+                    perror("getpwuid");
+                    exit(EXIT_FAILURE);
+                }
+                printf(" %s\n", pwd->pw_name);
+
+                grp = getgrgid(file_stat_list[file_iterator].st_gid);
+                if (grp == NULL) {
+                    perror("getgrgid");
+                    exit(EXIT_FAILURE);
+                }
+                printf(" %s\n", grp->gr_name);
                 printf(" %s\n", filename[file_iterator]);
             }
             else
