@@ -3,9 +3,9 @@
  * @author Gregoriy Bereznyakov (gregoriy93.gb@gmail.com)
  * @brief Консольное приложение-аналог утилиты ls для тестового задания
  * @date 2024-07-19
- * 
+ *
  * @copyright Square Enix (c) 2024
- * 
+ *
  */
 
 
@@ -17,6 +17,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <time.h>
 #include <grp.h>
 #include <pwd.h>
 
@@ -39,7 +40,7 @@ bool non_bytes = false;
 
 /**
  * @brief Вывести список файлов в каталогах
- * 
+ *
  * @param dir_list Список каталогов
  */
 void print_files_list(struct dirname_t *dir_list)
@@ -71,7 +72,7 @@ void print_files_list(struct dirname_t *dir_list)
         {
             printf("./\n");
             printf("../\n");
-            return;            
+            return;
         }
 
         struct stat file_stat_list[files_count];
@@ -87,14 +88,14 @@ void print_files_list(struct dirname_t *dir_list)
         {   //Каталог не найден
             printf("No such directory: %s", dir_iter->dirname);
             return;
-        }        
+        }
 
         //Получение списка файлов со всеми аттрибутами
         while((ep = readdir(dir_desc_ptr)) != NULL)
         {
             char path[PATH_MAX];
             snprintf(path, PATH_MAX, "%s/%s", dir_iter->dirname, ep->d_name);
-            if(stat(path, &file_stat_list[file_iterator])) 
+            if(stat(path, &file_stat_list[file_iterator]))
             {
                 printf("stat failed\n");
                 return;
@@ -139,14 +140,31 @@ void print_files_list(struct dirname_t *dir_list)
                     perror("getpwuid");
                     exit(EXIT_FAILURE);
                 }
-                printf(" %s\n", pwd->pw_name);
+                printf(" %s", pwd->pw_name);
 
                 grp = getgrgid(file_stat_list[file_iterator].st_gid);
                 if (grp == NULL) {
                     perror("getgrgid");
                     exit(EXIT_FAILURE);
                 }
-                printf(" %s\n", grp->gr_name);
+                printf(" %s", grp->gr_name);
+
+                if(non_bytes)
+                {
+                }
+                else
+                {
+                    printf("%llu", file_stat_list[file_iterator].st_size);
+                }
+
+                time_t t = file_stat_list[file_iterator].st_mtime;
+                struct tm lt;
+                localtime_r(&t, &lt);
+                char timbuf[80];
+                strftime(timbuf, sizeof(timbuf), " %c", &lt);
+
+                printf("%s", timbuf);
+
                 printf(" %s\n", filename[file_iterator]);
             }
             else
@@ -168,7 +186,7 @@ void print_files_list(struct dirname_t *dir_list)
 
 /**
  * @brief Главная функция
- * 
+ *
  * @param argc Число параметров
  * @param argv Массив параметров
  * @return int Возвращаемый результат
@@ -209,7 +227,7 @@ int main(int argc, char* argv[])
 
         if(optind >= argc) break;
     }
-    
+
     //Голова списка каталогов
     struct dirname_t head;
     head.dirname = NULL;
@@ -240,6 +258,6 @@ int main(int argc, char* argv[])
     }
 
     print_files_list(&head);
-    
+
     return 0;
 }
