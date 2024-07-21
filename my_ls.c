@@ -38,6 +38,15 @@ bool reverse = false;
 bool non_bytes = false;
 
 
+typedef enum
+{
+    _byte,
+    _kilobyte,
+    _megabyte,
+    _gigabyte
+}size_enum_t;
+
+
 /**
  * @brief Вывести список файлов в каталогах
  *
@@ -132,6 +141,9 @@ void print_files_list(struct dirname_t *dir_list)
                 printf( (file_stat_list[file_iterator].st_mode & S_IROTH) ? "r" : "-");
                 printf( (file_stat_list[file_iterator].st_mode & S_IWOTH) ? "w" : "-");
                 printf( (file_stat_list[file_iterator].st_mode & S_IXOTH) ? "x" : "-");
+
+                printf( (S_ISDIR(file_stat_list[file_iterator].st_mode)) ? " 2" : " 1");
+
                 struct passwd *pwd;
                 struct group *grp;
 
@@ -151,17 +163,57 @@ void print_files_list(struct dirname_t *dir_list)
 
                 if(non_bytes)
                 {
+                    size_enum_t size_type = _byte;
+                    long long size = file_stat_list[file_iterator].st_size;
+                    if(size > 1024)
+                    {
+                        size /= 1024;
+                        size_type = _kilobyte;
+                    }
+                    if(size > 1024)
+                    {
+                        size /= 1024;
+                        size_type = _megabyte;
+                    }
+                    if(size > 1024)
+                    {
+                        size /= 1024;
+                        size_type = _gigabyte;
+                    }
+
+                    switch (size_type)
+                    {
+                    case _byte:
+                        printf(" %llu", size);
+                        break;
+
+                    case _kilobyte:
+                        printf(" %lluK", size);
+                        break;
+
+                    case _megabyte:
+                        printf(" %lluM", size);
+                        break;
+
+                    case _gigabyte:
+                        printf(" %lluG", size);
+                        break;
+
+                    default:
+                        break;
+                    }
+
                 }
                 else
                 {
-                    printf("%llu", file_stat_list[file_iterator].st_size);
+                    printf(" %llu", file_stat_list[file_iterator].st_size);
                 }
 
                 time_t t = file_stat_list[file_iterator].st_mtime;
-                struct tm lt;
-                localtime_r(&t, &lt);
+                struct tm *lt;
+                lt = localtime(&t);
                 char timbuf[80];
-                strftime(timbuf, sizeof(timbuf), " %c", &lt);
+                strftime(timbuf, sizeof(timbuf), " %c", lt);
 
                 printf("%s", timbuf);
 
