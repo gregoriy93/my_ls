@@ -55,6 +55,8 @@ typedef enum
 void print_files_list(struct dirname_t *dir_list)
 {
     struct dirname_t *dir_iter = dir_list;
+    //Если задан каталог, голова списка не будет содержать имени каталога
+    if(dir_iter->next_dir != NULL)  dir_iter = dir_iter->next_dir;
 
     while(1)
     {
@@ -68,6 +70,8 @@ void print_files_list(struct dirname_t *dir_list)
             printf("No such directory: %s", dir_iter->dirname);
             return;
         }
+
+        printf("%s: \n", dir_iter->dirname);
 
         //Подсчёт числа файлов в каталоге
         int files_count = 0;
@@ -293,11 +297,12 @@ int main(int argc, char* argv[])
     {
         if(argv[i][0] != '-')
         {
+            //Добавляем новый элемент в список
             dir_iter->next_dir = (struct dirname_t *)malloc(sizeof(struct dirname_t));
             dir_iter = dir_iter->next_dir;
             dir_iter->dirname = NULL;
             dir_iter->next_dir = NULL;
-
+            //Запоминаем имя каталога
             dir_iter->dirname = (char *)malloc(strlen(argv[i]) * sizeof(char));
             strcpy(dir_iter->dirname, argv[i]);
         }
